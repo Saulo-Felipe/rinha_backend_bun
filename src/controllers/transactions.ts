@@ -1,6 +1,6 @@
 import { db } from "../app";
-import { TransactionRouteRequest, TransactionRouteResponse } from "./types/Global";
-import { getClientById } from "./utils/getClientById";
+import type { TransactionRouteRequest, TransactionRouteResponse } from "../types/Global";
+import { getClientById } from "../utils/getClientById";
 
 const utilTypeData = {
     "c": 1,
@@ -25,12 +25,18 @@ export function TransactionRoute({ body, params, set }: TransactionRouteRequest)
 
     // save transaction
     db.query(`
-        INSERT INTO transactions (valor, tipo, descricao, client_id)
-        VALUES (${body.valor}, '${body.tipo}', '${body.descricao}', ${client.id})
-    `).get();
+        INSERT INTO transactions (valor, tipo, descricao, realizada_em, client_id)
+        VALUES (
+            ${body.valor}, 
+            '${body.tipo}', 
+            '${body.descricao}', 
+            '${new Date().toISOString()}', 
+            ${client.id}
+        );
+    `).run();
 
     // update client saldo
-    db.query(`UPDATE clients SET saldo = ${client.saldo}`).get();
+    db.query(`UPDATE clients SET saldo = ${client.saldo} WHERE id = ${Number(client.id)}`).run();
 
     return {
         limite: client.limite,

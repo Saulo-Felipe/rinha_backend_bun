@@ -56,6 +56,15 @@ export interface Client {
     saldo: number;
 }
 
+export interface Transaction {
+    id: number;
+    valor: number;
+    tipo: "c" | "d";
+    descricao: string;
+    realizada_em: string;
+    client_id: number;
+}
+
 export interface Extract {
     id: number;
     limite: number;
