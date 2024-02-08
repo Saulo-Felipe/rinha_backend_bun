@@ -1,43 +1,29 @@
 version: '3.8'
 
 services:
-  api01: &api
-    build: .
-    hostname: api01
-
+  db_rinhabackend:
+    image: postgres:latest
+    hostname: host_rinhabackend
+    environment:
+      - POSTGRES_PASSWORD=123
+      - POSTGRES_USER=admin
+      - POSTGRES_DB=rinhabackend
     ports:
-      - 4000:8081
-
-    deploy:
-      resources:
-        limits:
-          cpus: "0.6"
-          memory: "200MB"
-
-  api02:
-    <<: *api
-    hostname: api02
-
-    ports:
-      - 4001:8081
-
-
-  nginx:
-    image: nginx:latest
+      - 5432:5432
     volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
-    depends_on:
-      - api01
-      - api02
-    ports:
-      - "9999:9999"
+      - ./src/config/database/initial-database-state.sql:/docker-entrypoint-initdb.d/script.sql
+    
     deploy:
       resources:
         limits:
-          cpus: "0.17"
-          memory: "10MB"
+          cpus: "0.13"
+          memory: "140MB"
+
+  server01:
+    
 
 networks:
   default:
     driver: bridge
     name: rinha-nginx-2024q1
+
