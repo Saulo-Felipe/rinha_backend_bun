@@ -1,7 +1,0 @@
-{
-  "dependencies": { "pg": "^8.11.3" },
-  "devDependencies": {
-    "@types/bun": "^1.0.5",
-    "@types/pg": "^8.11.0"
-  }
-}
