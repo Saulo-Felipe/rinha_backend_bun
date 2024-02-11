@@ -125,4 +125,4 @@ app.post("/clientes/:id/transacoes", async ({ params, body, set }) => {
 });
 
 
-app.listen(3001, () => console.log("Server is running!"));
+app.listen(3001, () => console.log("Server is running at 3001"));

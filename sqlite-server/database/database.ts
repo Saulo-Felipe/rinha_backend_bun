@@ -1,7 +1,7 @@
 import { Database } from "bun:sqlite";
 
 export const db = new Database(
-    process.env["DB_PATHNAME"] || "/home/saulof/rinha_backend_bun/v2_stable/sqlite-server/database/db.sqlite", 
+    process.env["DB_PATHNAME"] || "/home/saulof/rinha_backend_bun/sqlite-server/database/db.sqlite", 
     { create: true}
 );
 
