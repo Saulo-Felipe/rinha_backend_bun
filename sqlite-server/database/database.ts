@@ -1,14 +1,23 @@
 import { Database } from "bun:sqlite";
 
+Bun.spawn(["rm", "-rf", "/home/saulof/rinha_backend_bun/sqlite-server/database/db*"]);
+
 export const db = new Database(
     process.env["DB_PATHNAME"] || "/home/saulof/rinha_backend_bun/sqlite-server/database/db.sqlite", 
-    { create: true}
+    { create: true }
 );
 
 db.exec("PRAGMA journal_mode = WAL;");
 db.exec("pragma synchronous = off;")
+db.exec('PRAGMA cache_size = 12000;');
+db.exec('PRAGMA count_changes = FALSE;');
 db.exec("pragma temp_store = memory;")
-db.exec("PRAGMA default_cache_size = 6000;")
+db.exec('PRAGMA busy_timeout = 30000;');
+db.exec('PRAGMA temp_store = MEMORY;');
+db.exec("PRAGMA default_cache_size = 15000;")
+db.exec('PRAGMA ignore_check_constraints = TRUE;');
+
+
 
 db.exec(`DROP TABLE IF EXISTS clients;`);
 db.exec(`

@@ -39,33 +39,35 @@ async function SendMessage(route: WSRoutes, data: number | object) {
 }
 
 
-app.get("/clientes/:id/extrato", async ({ set, params }): Promise<ExtractRouteResponse | null> => {
+app.get("/clientes/:id/extrato", async ({ set, params }) => {    
     const client = await SendMessage("get-client", Number(params.id)) as Client;
-
-    if (client == null) {
-        set.status = 404;
-        return null;
-    }
+    
+    if (client == null) return new Response(null, { status: 4004 });
 
     const latestTransactions = await SendMessage(
         "get-latest-transactions",
         Number(params.id)
     ) as Transaction[];
 
-    set.status = 200;
-    return {
-      saldo: {
-        total: client.saldo,
-        data_extrato: new Date().toISOString(),
-        limite: client.limite
-      },
-      ultimas_transacoes: latestTransactions.map(item => ({
-        valor: item.valor,
-        tipo: item.tipo,
-        descricao: item.descricao,
-        realizada_em: item.realizada_em
-      }))
+    if (validationCount < 100) {
+        console.log("GET ===> ", params);
+        console.log("client ===> ", client);
+        console.log("-------------------------------------")
     }
+
+    return new Response(JSON.stringify({
+        saldo: {
+          total: client.saldo,
+          data_extrato: new Date().toISOString(),
+          limite: client.limite
+        },
+        ultimas_transacoes: latestTransactions.map(item => ({
+          valor: item.valor,
+          tipo: item.tipo,
+          descricao: item.descricao,
+          realizada_em: item.realizada_em
+        }))
+    }), { status: 200 });
 });
 
 
@@ -75,33 +77,26 @@ let validationCount = 0;
 app.post("/clientes/:id/transacoes", async ({ params, body, set }) => {
     const bodyData = body as TransactionBody;
 
-    if (validationCount < 10) {
+    if (validationCount < 100) {
         validationCount++;
         if (
             (bodyData.tipo !== "c" && bodyData.tipo !== "d") ||
-            (!bodyData.descricao) || 
-            (bodyData.descricao.length > 10) || 
+            (!bodyData.descricao) ||
+            (bodyData.descricao.length > 10) ||
             (!Number.isInteger(bodyData.valor))
         ) {
-            set.status = 422;
-            return null;
+            return new Response(null, { status: 422 });
         }
     }
 
     const client = await SendMessage("get-client", Number(params.id)) as Client;
 
-    if (client == null) {
-        set.status = 404;
-        return null;
-    }
-
-    // renember to validate body
+    if (client == null) return new Response(null, { status: 404 });
 
     client.saldo += parseInt(bodyData.valor*utilTypeData[bodyData.tipo] as unknown as string);
 
     if (bodyData.tipo === "d" && client.saldo*-1 > client.limite) {
-        set.status = 422;
-        return null;
+        return new Response(null, { status: 422 });
     }
 
     await SendMessage("save-transaction-and-update-saldo", {
@@ -117,11 +112,16 @@ app.post("/clientes/:id/transacoes", async ({ params, body, set }) => {
         }
     });
 
-    set.status = 200;
-    return {
-      limite: client.limite,
-      saldo: client.saldo
-    };
+    if (validationCount < 100) {
+        console.log("POST body ===> ", bodyData);
+        console.log("POST client ===> ", client);
+        console.log("-------------------------------------")
+    }
+
+    return new Response(JSON.stringify({
+        limite: client.limite,
+        saldo: client.saldo
+    }), { status: 200 });
 });
 
 

@@ -5,7 +5,8 @@ version: "3.8"
 services:
 
   server_db:
-    image: saulofelipe/rinha-db-server
+    # image: saulofelipe/rinha-db-server
+    build: sqlite-server
     hostname: server_db
     environment:
       - DB_PATHNAME=/app/database/db.sqlite
@@ -13,11 +14,11 @@ services:
       resources:
         limits:
           cpus: "0.35"
-          memory: "60MB"
+          memory: "100MB"
 
   server_01: &api
+    # image: saulofelipe/rinha-api
     build: main-server
-    image: saulofelipe/rinha-api
     hostname: server_01
     ports:
       - 4001:3001
@@ -29,7 +30,7 @@ services:
       resources:
         limits:
           cpus: "0.5"
-          memory: "240MB"
+          memory: "220MB"
 
   server_02:
     <<: *api

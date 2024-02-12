@@ -7,7 +7,7 @@ export const saveTransactionQuery = db.query(`
     VALUES ($valor, $tipo, $descricao, $client_id);
 `);
 
-export const updateClientSaldoQuery = db.query(`UPDATE clients SET saldo = $saldo WHERE id = $id`);
+export const updateClientSaldoQuery = db.query(`UPDATE clients SET saldo = $saldo WHERE id = $id;`);
 
 export const latestTransactionsQuery = db.query(`
     SELECT id, valor, tipo, descricao, realizada_em 

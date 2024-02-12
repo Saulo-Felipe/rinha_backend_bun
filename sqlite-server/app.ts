@@ -59,7 +59,7 @@ const server = serve({
 
                 // ordem importa
                 saveTransactionQuery.run(data.save);
-                updateClientSaldoQuery.run(data.update)
+                updateClientSaldoQuery.get(data.update)
 
                 ws.send(`${messageInfo.transactionId}/${JSON.stringify(null)}`)
             }
