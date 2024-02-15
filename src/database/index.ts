@@ -1,9 +1,9 @@
 import { Database } from "bun:sqlite";
 
-Bun.spawn(["rm", "-rf", "/home/saulof/rinha_backend_bun/sqlite-server/database/db*"]);
-
 export const db = new Database(
-    process.env["DB_PATHNAME"] || "/home/saulof/rinha_backend_bun/sqlite-server/database/db.sqlite", 
+    process.env["PRODUCTION"] 
+    ? `/app/database/db.sqlite`
+    : `${process.cwd()}/database/shared/db.sqlite`,
     { create: true }
 );
 
@@ -18,11 +18,10 @@ db.exec("PRAGMA default_cache_size = 15000;")
 db.exec('PRAGMA ignore_check_constraints = TRUE;');
 
 
-
 db.exec(`DROP TABLE IF EXISTS clients;`);
 db.exec(`
     CREATE TABLE clients (
-        id INTEGER PRIMARY KEY,
+        id INTEGER,
         saldo INTEGER NOT NULL,
         limite INTEGER NOT NULL
     );
@@ -48,5 +47,39 @@ db.exec(`
     (4, 10000000, 0),
     (5, 500000, 0)
 `);
+
+export const clientQuery = db.query(`SELECT * FROM clients WHERE id = $id;`);
+
+export const saveTransactionQuery = db.query(`
+    INSERT INTO transactions (valor, tipo, descricao, client_id)
+    VALUES ($valor, $tipo, $descricao, $client_id);
+`);
+
+export const updateClientSaldoQuery = db.query(`UPDATE clients SET saldo = $saldo WHERE id = $id;`);
+
+export const latestTransactionsQuery = db.query(`
+    SELECT id, valor, tipo, descricao, realizada_em 
+    FROM transactions
+    WHERE client_id = $id ORDER BY id DESC LIMIT 10
+`);
+
+const clearDbQuery = db.query(`
+    DELETE FROM transactions
+    WHERE id NOT IN (
+        SELECT id
+        FROM (
+            SELECT id
+            FROM transactions
+            ORDER BY id DESC
+            LIMIT 50
+        )
+    );
+`);
+
+if (process.env["CUSTOM_TRIGGER"]) {
+    console.log("DB cleanup started");
+    setInterval(() => clearDbQuery.run(), 10000);
+}
+
 
 console.warn("Database has been started.");

@@ -1,5 +1,4 @@
 {
-  "dependencies": { "elysia": "^0.8.16" },
   "devDependencies": {
     "@types/bun": "^1.0.5"
   }
