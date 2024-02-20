@@ -3,7 +3,7 @@ import { clientQuery, saveTransactionQuery, updateClientSaldoQuery } from "../da
 
 const utilTypeData = { "c": 1, "d": -1 };
 
-export async function POSTTtransaction(clientId: number, body: TransactionBody): Promise<PostTransactionReturn> {
+export function POSTTtransaction(clientId: number, body: TransactionBody): PostTransactionReturn {
     if (
         (body.tipo !== "c" && body.tipo !== "d") ||
         (!body.descricao) ||
@@ -13,27 +13,27 @@ export async function POSTTtransaction(clientId: number, body: TransactionBody):
         return { body: null, status: 422 };
     }
 
-    const client = clientQuery.get({$id: clientId}) as Client;
+    const client = clientQuery.get({ $id: clientId }) as Client;
 
-    if (client == null) return { body: null, status: 404 };
-
-    client.saldo += parseInt(body.valor*utilTypeData[body.tipo] as unknown as string);
+    client.saldo += Number(body.valor*utilTypeData[body.tipo]);
 
     if (body.tipo === "d" && client.saldo*-1 > client.limite) {
         return { body: null, status: 422 };
     }
-    
-    saveTransactionQuery.run({
-        $descricao: body.descricao,
-        $tipo: body.tipo,
-        $valor: body.valor,
-        $client_id: client.id
-    });
 
-    updateClientSaldoQuery.run({
-        $saldo: client.saldo,
-        $id: client.id
-    });
+    (async () => {
+        saveTransactionQuery.run({
+            $descricao: body.descricao,
+            $tipo: body.tipo,
+            $valor: body.valor,
+            $client_id: client.id
+        });
+
+        updateClientSaldoQuery.run({
+            $saldo: client.saldo,
+            $id: client.id
+        });
+    })();
 
     return {
         status: 200,

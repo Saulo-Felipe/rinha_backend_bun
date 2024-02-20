@@ -1,10 +1,8 @@
 import type { Client, GetExtractReturn, Transaction } from "../Types";
 import { clientQuery, latestTransactionsQuery } from "../database";
 
-export async function GETExtract(clientId: number): Promise<GetExtractReturn> {
+export function GETExtract(clientId: number): GetExtractReturn {
     const client = clientQuery.get({$id: clientId}) as Client;
-
-    if (client == null) return {body: null, status: 404};
 
     const latestTransactions = latestTransactionsQuery.all({ $id: client.id }) as Transaction[];
 

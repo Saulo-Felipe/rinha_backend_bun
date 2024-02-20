@@ -2,16 +2,15 @@ import { Database } from "bun:sqlite";
 
 export const db = new Database(
     process.env["PRODUCTION"] 
-    ? `/app/database/db.sqlite`
-    : `${process.cwd()}/database/shared/db.sqlite`,
+        ? `/app/database/db.sqlite`
+        : `${process.cwd()}/database/shared/db.sqlite`,
     { create: true }
 );
+
 
 db.exec("PRAGMA journal_mode = WAL;");
 db.exec("pragma synchronous = off;")
 db.exec('PRAGMA cache_size = 12000;');
-db.exec('PRAGMA count_changes = FALSE;');
-db.exec("pragma temp_store = memory;")
 db.exec('PRAGMA busy_timeout = 30000;');
 db.exec('PRAGMA temp_store = MEMORY;');
 db.exec("PRAGMA default_cache_size = 15000;")
@@ -48,6 +47,8 @@ db.exec(`
     (5, 500000, 0)
 `);
 
+
+// queries
 export const clientQuery = db.query(`SELECT * FROM clients WHERE id = $id;`);
 
 export const saveTransactionQuery = db.query(`

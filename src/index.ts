@@ -9,11 +9,14 @@ Bun.serve({
         const { pathname } = new URL(request.url);
 
         if (pathname.includes("cliente")) {
+
             const clientId = GetIdFromPathname(pathname);
 
+            if (clientId > 5 || clientId < 1 || isNaN(clientId)) return new Response(null, { status: 404 });
+
             const { body, status } = request.method === "GET"
-                ? await GETExtract(clientId)
-                : await POSTTtransaction(clientId, await GetTransactionFromRequest(request))
+                ? GETExtract(clientId)
+                : POSTTtransaction(clientId, await GetTransactionFromRequest(request))
 
             return new Response(JSON.stringify(body), { status })
         }
