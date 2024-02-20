@@ -3,7 +3,6 @@ import { GETExtract } from "./routes/get-extract";
 import { GetIdFromPathname, GetTransactionFromRequest } from "./utils";
 import { POSTTtransaction } from "./routes/post-transaction";
 
-let isLocked = false;
 let validationCountLimit = 0;
 
 Bun.serve({
@@ -14,7 +13,7 @@ Bun.serve({
         if (pathname.includes("cliente")) {
             if (process.env["IS_SERVER_2"] && validationCountLimit < 123/2) {
                 validationCountLimit++;
-                console.log("encaminhando: nº", validationCountLimit);
+
                 const response = await fetch("http://server_01:3000"+pathname, {
                     method: request.method,
                     body: await request.text()
