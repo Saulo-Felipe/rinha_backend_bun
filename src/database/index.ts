@@ -3,7 +3,7 @@ import { Database } from "bun:sqlite";
 export const db = new Database(
     process.env["PRODUCTION"] 
         ? `/app/database/db.sqlite`
-        : `${process.cwd()}/database/shared/db.sqlite`,
+        : `${process.cwd()}/src/database/db.sqlite`,
     { create: true }
 );
 
@@ -77,7 +77,7 @@ const clearDbQuery = db.query(`
     );
 `);
 
-if (process.env["CUSTOM_TRIGGER"]) {
+if (process.env["IS_SERVER_2"]) {
     console.log("DB cleanup started");
     setInterval(() => clearDbQuery.run(), 10000);
 }

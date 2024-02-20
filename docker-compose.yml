@@ -14,7 +14,6 @@ services:
           memory: "267MB"
     volumes:
       - db_volume:/app/database:rw
-      - lock_volume:/app/racecondition:rw
     environment:
       - PRODUCTION=true
 
@@ -26,7 +25,7 @@ services:
     depends_on:
       - server_01
     environment:
-      - CUSTOM_TRIGGER=true
+      - IS_SERVER_2=true
       - PRODUCTION=true # required
 
   nginx:
@@ -45,4 +44,8 @@ services:
 
 volumes:
   db_volume:
-  lock_volume:
+
+networks:
+  default:
+    driver: bridge
+    name: rinha-nginx-2024q1

@@ -8,3 +8,11 @@ export function GetIdFromPathname(pathname: string): number {
 export async function GetTransactionFromRequest(request: Request): Promise<Transaction> {
     return JSON.parse(await request.text());
 }
+
+export async function WaitUnlock(param) {
+    return await new Promise(resolve => {
+        while (true) {
+            
+        }
+    })
+}
